@@ -31,4 +31,50 @@
 
 五、webpack的另一种用法：通过配置文件来使用WebPack
   1、Webpack拥有很多其它的比较高级的功能（比如说本文后面会介绍的loaders和plugins），这些功能其实都可以通过命令行模式实现，但是正如已经提到的，这样不太方便且容易出错的，一个更好的办法是定义一个配置文件，这个配置文件其实也是一个简单的JavaScript模块，可以把所有的与构建相关的信息放在里面。
+  2、配置文件的书写：这个配置文件是在项目文件夹的根部目录下面创建的！
+  module.exports = {
+  entry:  __dirname + "/app/main.js",//已多次提及的唯一入口文件
+  output: {
+    path: __dirname + "/public",//打包后的文件存放的地方
+    filename: "bundle.js"//打包后输出文件的文件名
+  }
+}
+   【注意】：“__dirname”是node.js中的一个全局变量，它指向当前执行脚本所在的目录。
+   3、当配置文件设置妥当之后，你只需要在终端运行以下的代码即可实现上面那些环节所实现的目标：
+   node_modules/.bin/webpack
+   
+六、实现更快捷的打包方式：
+  1、执行类似于node_modules/.bin/webpack这样的命令其实是比较烦人且容易出错的，不过值得庆幸的是npm可以引导任务执行，对其进行配置后可以使用简单的npm start命令来代替这些繁琐的命令。在package.json中对npm的脚本部分进行相关设置即可，设置方法如下
+{
+  "name": "webpack-sample-project",
+  "version": "1.0.0",
+  "description": "Sample webpack project",
+  "scripts": {
+    "start": "webpack" //配置的地方就是这里啦，相当于把npm的start命令指向webpack命令
+  },
+  "author": "MJ",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^3.3.0"
+  }
+}
+【注意】：package.json中的脚本部分已经默认在命令前添加了node_modules/.bin路径，所以无论是全局还是局部安装的Webpack，你都不需要写前面那指明详细的路径了。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
