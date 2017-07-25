@@ -21,4 +21,14 @@
   npm install -g webpack
   //安装到你的项目目录
   npm install --save-dev webpack
-  
+  2、正式使用webpack
+    2.1、webpack可以在终端中使用，其最基本的命令是：
+    webpack {entry file/入口文件} {destination for bundled file/存放bundle.js的地方}
+    2.2、全局安装的情况下：
+    webpack app/main.js public/bundle.js
+         非全局安装情况下：
+    node_modules/.bin/webpack app/main.js public/bundle.js
+
+五、webpack的另一种用法：通过配置文件来使用WebPack
+  1、Webpack拥有很多其它的比较高级的功能（比如说本文后面会介绍的loaders和plugins），这些功能其实都可以通过命令行模式实现，但是正如已经提到的，这样不太方便且容易出错的，一个更好的办法是定义一个配置文件，这个配置文件其实也是一个简单的JavaScript模块，可以把所有的与构建相关的信息放在里面。
+
