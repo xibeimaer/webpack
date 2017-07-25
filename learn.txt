@@ -60,6 +60,84 @@
 }
 【注意】：package.json中的脚本部分已经默认在命令前添加了node_modules/.bin路径，所以无论是全局还是局部安装的Webpack，你都不需要写前面那指明详细的路径了。
 
+七、webpack的强大功能
+  1、生成Source Maps(使调试变得更加容易)
+    1.1、开发总是离不开调试，如果可以更加方便的调试当然就能提高开发效率，不过打包后的文件有时候你是不容易找到出错了的地方对应的源代码的位置的，              Source Maps就是来帮我们解决这个问题的。
+         通过简单的配置后，Webpack在打包时可以为我们生成的source maps，这为我们提供了一种对应编译文件和源文件的方法，使得编译后的代码可读性更高，也          更容易调试。
+    1.2、在webpack的配置文件中配置source maps，需要配置devtool，它有以下四种不同的配置选项，各具优缺点，描述如下：
+      devtool选项              配置结果
+      
+      source-map               在一个单独的文件中产生一个完整且功能完全的文件。这个文件具有最好的source map，但是它会减慢打包文件的构建速度；
+      
+ cheap-module-source-map       在一个单独的文件中生成一个不带列映射的map，不带列映射提高项目构建速度，但是也使得浏览器开发者工具只能对应到具体的                                  行，不能对应到具体的列（符号），会对调试造成不便；
+ 
+ eval-source-map               使用eval打包源文件模块，在同一个文件中生成干净的完整的source map。这个选项可以在不影响构建速度的前提下生成完整的                                  sourcemap，但是对打包后输出的JS文件的执行具有性能和安全的隐患。不过在开发阶段这是一个非常好的选项，但是在生产阶段                                一定不要用这个选项；
+ 
+ cheap-module-eval-source-map  这是在打包文件时最快的生成source map的方法，生成的Source Map 会和打包后的JavaScript文件同行显示，没有列映射，和                                eval-source-map选项具有相似的缺点；
+
+正如上表所述，上述选项由上到下打包速度越来越快，不过同时也具有越来越多的负面作用，较快的构建速度的后果就是对打包后的文件的的执行有一定影响。
+
+在学习阶段以及在小到中性的项目上，eval-source-map是一个很好的选项，不过记得只在开发阶段使用它，继续上面的例子，进行如下配置
+module.exports = {
+  devtool: 'eval-source-map',//配置生成Source Maps，选择合适的选项
+  entry:  __dirname + "/app/main.js",
+  output: {
+    path: __dirname + "/public",
+    filename: "bundle.js"
+  }
+}
+
+2、利用webpack构建本地服务器
+  1、想不想让你的浏览器监测你的代码的修改，并自动刷新修改后的结果，其实Webpack提供一个可选的本地开发服务器，这个本地服务器基于node.js构建，可以实现      你想要的这些功能，不过它是一个单独的组件，在webpack中进行配置之前需要单独安装它作为项目依赖。
+     npm install --save-dev webpack-dev-server
+     devserver作为webpack配置选项中的一项，具有以下配置选项
+devserver       功能描述
+
+contentBase     默认webpack-dev-server会为根文件夹提供本地服务器，如果想为另外一个目录下的文件提供本地服务器，应该在这里设置其所在目录（本例设置                   到“public"目录）
+port            设置默认监听端口，如果省略，默认为”8080“
+inline          设置为true，当源文件改变时会自动刷新页面
+colors          设置为true，使终端输出的文件为彩色的
+historyApiFallback  在开发单页应用时非常有用，它依赖于HTML5 history API，如果设置为true，所有的跳转将指向index.htm
+    继续把这些命令加到webpack的配置文件中，现在的配置文件如下所示
+    
+module.exports = {
+  devtool: 'eval-source-map',
+  entry:  __dirname + "/app/main.js",
+  output: {
+    path: __dirname + "/public",
+    filename: "bundle.js"
+  },
+  devServer: {
+    contentBase: "./public",//本地服务器所加载的页面所在的目录
+    colors: true,//终端中输出结果为彩色
+    historyApiFallback: true,//不跳转
+    inline: true//实时刷新
+  }
+}
+
+3、Loaders
+  3.1、Loaders是webpack中最让人激动人心的功能之一了。通过使用不同的loader，webpack通过调用外部的脚本或工具可以对各种各样的格式的文件进行处理，比如        说分析JSON文件并把它转换为JavaScript文件，或者说把下一代的JS文件（ES6，ES7)转换为现代浏览器可以识别的JS文件。或者说对React的开发而言，合适        的Loaders可以把React的JSX文件转换为JS文件。
+  3.2、Loaders需要单独安装并且需要在webpack.config.js下的modules关键字下进行配置，Loaders的配置选项包括以下几方面： 
+     test：一个匹配loaders所处理的文件的拓展名的正则表达式（必须）
+     loader：loader的名称（必须）
+     include/exclude:手动添加必须处理的文件（文件夹）或屏蔽不需要处理的文件（文件夹）（可选）；
+     query：为loaders提供额外的设置选项（可选）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
