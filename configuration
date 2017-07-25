@@ -1,1 +1,5 @@
-//一个常见的
+//一个常见的Webpack配置文件
+var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-plugin');
+
