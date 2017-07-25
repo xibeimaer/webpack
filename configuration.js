@@ -4,10 +4,10 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-plugin');
 
 module.exports = {
-  entry:_dirname + "/app/main.js",
+  entry:_dirname + "/app/main.js",  //唯一的入口文件
   output:{
-    path:_dirname + "/build",
-    filename:"[name]-[hash].js"
+    path:_dirname + "/build",    //打包后文件的存放的地方
+    filename:"[name]-[hash].js"  //打包后文件输出的文件名
   },
   module:{
     loaders:[
