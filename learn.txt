@@ -121,12 +121,167 @@ module.exports = {
      test：一个匹配loaders所处理的文件的拓展名的正则表达式（必须）
      loader：loader的名称（必须）
      include/exclude:手动添加必须处理的文件（文件夹）或屏蔽不需要处理的文件（文件夹）（可选）；
-     query：为loaders提供额外的设置选项（可选）
+     query：为loaders提供额外的设置选项（可选）
+4、Babel
+  4.1、Babel其实是一个编译JavaScript的平台，它的强大之处表现在可以通过编译帮你达到以下目的：
+      下一代的JavaScript标准（ES6，ES7），这些标准目前并未被当前的浏览器完全的支持；
+      使用基于JavaScript进行了拓展的语言，比如React的JS
+  4.2、Babel的安装与配置
+      npm install --save-dev babel-core babel-loader babel-preset-es2015 babel-preset-react
+  4.3、在webpack中配置Babel的方法如下：
+      module.exports = {
+  devtool: 'eval-source-map',
+  entry:  __dirname + "/app/main.js",
+  output: {
+    path: __dirname + "/public",
+    filename: "bundle.js"
+  },
+  module: {
+    loaders: [
+      {
+        test: /\.json$/,
+        loader: "json"
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel',//在webpack的module部分的loaders里进行配置即可
+        query: {
+          presets: ['es2015','react']
+        }
+      }
+    ]
+  },
+  devServer: {
+    contentBase: "./public",
+    colors: true,
+    historyApiFallback: true,
+    inline: true
+  }
+}
+  4.4、Babel其实可以完全在webpack.config.js中进行配置，但是考虑到babel具有非常多的配置选项，在单一的webpack.config.js文件中进行配置往往使得这个文        件显得太复杂，因此一些开发者支持把babel的配置选项放在一个单独的名为 ".babelrc" 的配置文件中。我们现在的babel的配置并不算复杂，不过之后我们会        再加一些东西，因此现在我们就提取出相关部分，分两个配置文件进行配置（webpack会自动调用.babelrc里的babel配置选项）
 
+5、CSS
+  5.1、webpack提供两个工具处理样式表，css-loader 和 style-loader，二者处理的任务不同，css-loader使你能够使用类似@import 和 url(...)的方法实现          require()的功能,style-loader将所有的计算后的样式加入页面中，二者组合在一起使你能够把样式表嵌入webpack打包后的JS文件中。
+  5.2、安装配置
+      npm install --save-dev style-loader css-loader
+      
+      //使用
+module.exports = {
+  devtool: 'eval-source-map',
 
+  entry:  __dirname + "/app/main.js",
+  output: {
+    path: __dirname + "/build",
+    filename: "bundle.js"
+  },
 
+  module: {
+    loaders: [
+      {
+        test: /\.json$/,
+        loader: "json"
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style!css'//添加对样式表的处理
+      }
+    ]
+  },
 
+  devServer: {...}
+}
+注：感叹号的作用在于使同一文件能够使用不同类型的loader
+  webpack只有单一的入口，其它的模块需要通过 import, require, url等导入相关位置。
+//main.js
+import React from 'react';
+import {render} from 'react-dom';
+import Greeter from './Greeter'
+import './main.css';//使用require导入css文件
+render(<Greeter />, document.getElementById('root'));
+通常情况下，css会和js打包到同一个文件中，并不会打包为一个单独的css文件，不过通过合适的配置webpack也可以把css打包为单独的文件的。
+不过这也只是webpack把css当做模块而已。
 
+6、CSS module
+  6.1、在过去的一些年里，JavaScript通过一些新的语言特性，更好的工具以及更好的实践方法（比如说模块化）发展得非常迅速。模块使得开发者把复杂的代码转化       为小的，干净的，依赖声明明确的单元，且基于优化工具，依赖管理和加载管理可以自动完成。
+      不过前端的另外一部分，CSS发展就相对慢一些，大多的样式表却依旧是巨大且充满了全局类名，这使得维护和修改都非常困难和复杂。
+
+      最近有一个叫做 CSS modules 的技术就意在把JS的模块化思想带入CSS中来，通过CSS模块，所有的类名，动画名默认都只作用于当前模块。Webpack从一开始就       对CSS模块化提供了支持，在CSS loader中进行配置后，你所需要做的一切就是把”modules“传递到所需要的地方，然后就可以直接把CSS的类名传递到组件的代       码中，且这样做只对当前组件有效，不必担心在不同的模块中具有相同的类名可能会造成的问题
+
+  6.2、配置的代码如下：
+  module.exports = {
+  devtool: 'eval-source-map',
+
+  entry:  __dirname + "/app/main.js",
+  output: {...},
+
+  module: {
+    loaders: [
+      {
+        test: /\.json$/,
+        loader: "json"
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style!css?modules'//跟前面相比就在后面加上了?modules
+      }
+    ]
+  },
+
+  devServer: {...}
+}
+
+7、CSS预处理器
+  7.1、Sass 和 Less之类的预处理器是对原生CSS的拓展，它们允许你使用类似于variables, nesting, mixins, inheritance等不存在于CSS中的特性来写CSS，          CSS预处理器可以这些特殊类型的语句转化为浏览器可识别的CSS语句，
+       你现在可能都已经熟悉了，在webpack里使用相关loaders进行配置就可以使用了，以下是常用的CSS 处理loaders
+       Less Loader
+       Sass Loader
+       Stylus Loader
+       不过其实也存在一个CSS的处理平台-PostCSS，它可以帮助你的CSS实现更多的功能，在其CSS官方文档可了解更多相关知识。
+       举例来说如何使用PostCSS，我们使用PostCSS来为CSS代码自动添加适应不同浏览器的CSS前缀。
+  7.2、首先安装postcss-loader 和 autoprefixer（自动添加前缀的插件）
+      npm install --save-dev postcss-loader autoprefixer
+      接下来，在webpack配置文件中进行设置，只需要新建一个postcss关键字，并在里面申明依赖的插件，如下，现在你写的css会自动根据Can i use里的数据添加       不同前缀了
+      //webpack配置文件
+module.exports = {
+  devtool: 'eval-source-map',
+  entry: __dirname + "/app/main.js",
+  output: {...},
+
+  module: {
+    loaders: [
+      {
+        test: /\.json$/,
+        loader: "json"
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style!css?modules!postcss'
+      }
+    ]
+  },
+
+  postcss: [
+    require('autoprefixer')//调用autoprefixer插件
+  ],
+
+  devServer: {...}
+}
 
 
 
